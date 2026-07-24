@@ -28,10 +28,15 @@ logging.getLogger("peewee").setLevel(logging.WARNING)
 # Suppress urllib3 connection pool warnings (caused by yfinance batch downloads)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 
-ALLOWED_ORIGINS = os.getenv(
+_raw_origins = os.getenv(
     "CORS_ORIGINS",
     "http://localhost:5173,http://localhost:3000,http://localhost:5174"
 ).split(",")
+
+# Support wildcard Vercel preview URLs (*.vercel.app)
+import re
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins if o.strip()]
+ALLOW_ORIGIN_REGEX = r"https://.*\.vercel\.app"
 
 
 # ---------------------------------------------------------------------------
@@ -81,6 +86,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=ALLOW_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

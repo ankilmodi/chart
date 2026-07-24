@@ -33,15 +33,7 @@ _raw_origins = os.getenv(
     "http://localhost:5173,http://localhost:3000,http://localhost:5174"
 ).split(",")
 
-# Support wildcard Vercel preview URLs (*.vercel.app)
-import re
 ALLOWED_ORIGINS = [o.strip() for o in _raw_origins if o.strip()]
-ALLOW_ORIGIN_REGEX = r"https://.*\.vercel\.app"
-
-# If CORS_ORIGINS env var is set to "*", allow all origins (useful for initial deploy)
-if "*" in ALLOWED_ORIGINS:
-    ALLOWED_ORIGINS = ["*"]
-    ALLOW_ORIGIN_REGEX = None
 
 
 # ---------------------------------------------------------------------------
@@ -87,17 +79,14 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS
-_cors_kwargs: dict = dict(
+# CORS - Allow all origins
+app.add_middleware(
+    CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True if "*" not in ALLOWED_ORIGINS else False,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-if ALLOW_ORIGIN_REGEX:
-    _cors_kwargs["allow_origin_regex"] = ALLOW_ORIGIN_REGEX
-
-app.add_middleware(CORSMiddleware, **_cors_kwargs)
 
 # Routes
 app.include_router(router,         prefix="/api")

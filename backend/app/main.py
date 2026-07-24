@@ -38,6 +38,11 @@ import re
 ALLOWED_ORIGINS = [o.strip() for o in _raw_origins if o.strip()]
 ALLOW_ORIGIN_REGEX = r"https://.*\.vercel\.app"
 
+# If CORS_ORIGINS env var is set to "*", allow all origins (useful for initial deploy)
+if "*" in ALLOWED_ORIGINS:
+    ALLOWED_ORIGINS = ["*"]
+    ALLOW_ORIGIN_REGEX = None
+
 
 # ---------------------------------------------------------------------------
 # Background warmup – runs scan once at startup so first API call is instant
@@ -83,14 +88,16 @@ app = FastAPI(
 )
 
 # CORS
-app.add_middleware(
-    CORSMiddleware,
+_cors_kwargs: dict = dict(
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=ALLOW_ORIGIN_REGEX,
-    allow_credentials=True,
+    allow_credentials=True if "*" not in ALLOWED_ORIGINS else False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+if ALLOW_ORIGIN_REGEX:
+    _cors_kwargs["allow_origin_regex"] = ALLOW_ORIGIN_REGEX
+
+app.add_middleware(CORSMiddleware, **_cors_kwargs)
 
 # Routes
 app.include_router(router,         prefix="/api")

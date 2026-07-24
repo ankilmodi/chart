@@ -7,8 +7,10 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: CORS_ORIGINS
-        value: https://chart-ankilmodi.vercel.app
+        value: "*"
       - key: LOG_LEVEL
         value: INFO
       - key: REFRESH_INTERVAL_SECONDS
         value: "60"
+      - key: PYTHON_VERSION
+        value: "3.12.3"

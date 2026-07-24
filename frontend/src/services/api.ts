@@ -129,3 +129,10 @@ export const generateNotifications  = async () =>
 export const exportCSV = (minScore = 0) => {
   window.open(`${BASE_URL}/export/csv?min_score=${minScore}`, '_blank');
 };
+
+// ── Missing exports (stub – endpoints may not exist yet) ──────────────────
+export const fetchGapAnalysis      = async () => (await api.get('/gap-analysis')).data;
+export const fetchOrbAnalysis      = async () => (await api.get('/orb-analysis')).data;
+export const fetchStocksQuotes     = async () => (await api.get('/stocks-quotes')).data;
+export const fetchScannerUniverse  = async (index = 'ALL') => (await api.get(`/scanner/universe?index=${index}`)).data;
+export const fetchBacktest         = async (symbol: string) => (await api.get(`/backtest/${symbol}`)).data;

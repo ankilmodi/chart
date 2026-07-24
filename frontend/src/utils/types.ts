@@ -289,3 +289,37 @@ export interface StocksQuotesResponse {
 export type SignalType = 'STRONG BUY' | 'BUY' | 'WATCH' | 'HOLD' | 'SELL' | 'STRONG SELL';
 export type TrendType = 'Strong Uptrend' | 'Uptrend' | 'Sideways' | 'Weak Downtrend' | 'Strong Downtrend';
 export type MomentumType = 'Strong' | 'Increasing' | 'Weak' | 'Loss';
+
+// StockQuote – for NIFTY 50 live quotes tab
+export interface StockQuote {
+  symbol: string;
+  ticker: string;
+  name: string;
+  sector: string;
+  price: number;
+  change: number;
+  change_pct: number;
+  volume: number;
+  signal: 'BUY' | 'SELL' | 'NEUTRAL';
+}
+
+// ScannerUniverseStock – for Universe page
+export interface ScannerUniverseStock {
+  symbol: string;
+  ticker: string;
+  name: string;
+  sector: string;
+  index: string;
+}
+
+// BacktestResult – for Backtest page
+export interface BacktestResult {
+  symbol: string;
+  trades: number;
+  win_rate: number;
+  total_return_pct: number;
+  avg_return_pct: number;
+  max_drawdown_pct: number;
+  sharpe_ratio: number;
+  timestamp: string;
+}

@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  # ─── Unified Backend (Nifty Analyzer + Weekly Scanner) ──────────────────
+  # Scanner routes available at /api/scanner/*
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nifty-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - REFRESH_INTERVAL_SECONDS=60
+      - CORS_ORIGINS=http://localhost:80,http://localhost:3000,http://frontend:80
+      - LOG_LEVEL=INFO
+      # Weekly Scanner settings
+      - SCAN_HOUR=9
+      - SCAN_MINUTE=30
+      - CAPITAL=100000
+      - MAX_POSITIONS=5
+      - MAX_RISK_PCT=1.0
+      - MIN_RR_RATIO=2.0
+      - VIX_THRESHOLD=18.0
+      - VIX_REJECT=20.0
+      # Optional: set your free API keys
+      # - TWELVEDATA_API_KEY=your_key_here
+      # - ALPHAVANTAGE_API_KEY=your_key_here
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ─── Unified Frontend (Nifty Analyzer + Weekly Scanner UI) ──────────────
+  # Scanner pages: /scanner, /backtest, /universe
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nifty-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_URL=/api
+
+networks:
+  default:
+    name: nifty-network
